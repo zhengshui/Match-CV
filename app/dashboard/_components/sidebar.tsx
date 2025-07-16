@@ -3,12 +3,13 @@
 import UserProfile from "@/components/user-profile";
 import clsx from "clsx";
 import {
-  Banknote,
   HomeIcon,
   LucideIcon,
   MessageCircleIcon,
   Settings,
-  Upload,
+  FileText,
+  Briefcase,
+  BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -26,19 +27,24 @@ const navItems: NavItem[] = [
     icon: HomeIcon,
   },
   {
+    label: "Resumes",
+    href: "/dashboard/resumes",
+    icon: FileText,
+  },
+  {
+    label: "Jobs",
+    href: "/dashboard/jobs",
+    icon: Briefcase,
+  },
+  {
+    label: "Evaluations",
+    href: "/dashboard/evaluations",
+    icon: BarChart3,
+  },
+  {
     label: "Chat",
     href: "/dashboard/chat",
     icon: MessageCircleIcon,
-  },
-  {
-    label: "Upload",
-    href: "/dashboard/upload",
-    icon: Upload,
-  },
-  {
-    label: "Payment Gated",
-    href: "/dashboard/payment",
-    icon: Banknote,
   },
 ];
 
@@ -55,7 +61,7 @@ export default function DashboardSideBar() {
             className="flex items-center font-semibold hover:cursor-pointer"
             href="/"
           >
-            <span>Nextjs Starter Kit</span>
+            <span>Match-CV</span>
           </Link>
         </div>
 
