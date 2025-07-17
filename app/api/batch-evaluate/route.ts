@@ -202,10 +202,10 @@ export async function GET(request: Request) {
       .where(inArray(resume.id, resumeIds));
 
     // Combine evaluation and resume data
-    const results = evaluations.map(eval => {
-      const resumeInfo = resumes.find(r => r.id === eval.resumeId);
+    const results = evaluations.map(evaluation => {
+      const resumeInfo = resumes.find(r => r.id === evaluation.resumeId);
       return {
-        ...eval,
+        ...evaluation,
         resumeFilename: resumeInfo?.filename || "Unknown",
         resumeCreatedAt: resumeInfo?.createdAt,
       };

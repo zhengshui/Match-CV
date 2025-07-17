@@ -1,15 +1,12 @@
-import { openai } from "@ai-sdk/openai";
+import { openai } from "@/lib/openai-config";
 import { streamText } from "ai";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = streamText({
-    model: openai.responses("gpt-4o"),
+    model: openai("gpt-4o"),
     messages,
-    tools: {
-      web_search_preview: openai.tools.webSearchPreview(),
-    },
   });
 
   return result.toDataStreamResponse();

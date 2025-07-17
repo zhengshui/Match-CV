@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { account, session, subscription, user, verification } from "@/db/schema";
+import { account, session, user, verification } from "@/db/schema";
 // Remove polar imports for V1
 // import {
 //   checkout,
@@ -29,7 +29,6 @@ export const auth = betterAuth({
       session,
       account,
       verification,
-      subscription,
     },
   }),
   socialProviders: {

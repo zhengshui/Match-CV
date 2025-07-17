@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { openai } from "@/lib/openai-config";
 import { generateObject } from "ai";
 import { z } from "zod";
 

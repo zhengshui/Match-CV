@@ -1,18 +1,15 @@
-import FooterSection from "@/components/homepage/footer";
-import HeroSection from "@/components/homepage/hero-section";
-import Integrations from "@/components/homepage/integrations";
-import { getSubscriptionDetails } from "@/lib/subscription";
-import PricingTable from "./pricing/_component/pricing-table";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const subscriptionDetails = await getSubscriptionDetails();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  return (
-    <>
-      <HeroSection />
-      <Integrations />
-      <PricingTable subscriptionDetails={subscriptionDetails} />
-      <FooterSection />
-    </>
-  );
+  if (session?.user) {
+    redirect("/dashboard");
+  } else {
+    redirect("/sign-in");
+  }
 }
