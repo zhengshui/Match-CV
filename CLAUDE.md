@@ -8,20 +8,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Parse resumes from multiple formats (PDF, Word, text)
 - Match candidates against job descriptions using AI
-- Score and rank candidates based on multiple criteria
+- Score and rank candidates based on multiple criteria (skills, experience, education)
 - Provide intelligent filtering and recommendation systems
-- Generate detailed evaluation reports
+- Generate detailed evaluation reports with strengths/weaknesses analysis
+- Process multiple resumes in batch for efficient screening
 
 ## Tech Stack
 
 - **Framework**: Next.js 15.3.1 with App Router
 - **Language**: TypeScript with strict mode
 - **Database**: Neon PostgreSQL with Drizzle ORM
-- **Authentication**: Better Auth v1.2.8
-- **AI Integration**: OpenAI SDK (@ai-sdk/openai)
+- **Authentication**: Better Auth v1.2.8 (email/password only)
+- **AI Integration**: OpenAI SDK v1.3.22 for resume parsing and evaluation
 - **Styling**: Tailwind CSS v4 + shadcn/ui components
 - **Forms**: React Hook Form with Zod validation
-- **State Management**: React Query (@tanstack/react-query)
+- **File Processing**: PDF parsing and text extraction
 - **Deployment**: Vercel (recommended)
 
 ## Development Commands
@@ -52,15 +53,19 @@ npx drizzle-kit studio     # Open database studio
 
 ### Database Schema (Drizzle ORM)
 - **Authentication**: `user`, `session`, `account`, `verification` tables
-- **Subscriptions**: `subscription` table (to be removed in v1)
-- **Core CV System**: Tables for resumes, jobs, evaluations, and scoring (to be added)
+- **Resume System**: `resume` table with file metadata and parsed content
+- **Job Management**: `job` table with descriptions and requirements
+- **Evaluation System**: `evaluation` table with scoring and detailed analysis
 
 ### API Routes Structure
 ```
 app/api/
 ├── auth/[...all]/route.ts    # Better Auth handler
+├── resumes/route.ts          # Resume upload and management
+├── jobs/route.ts             # Job description management
+├── evaluations/route.ts      # Individual resume evaluation
+├── batch-evaluate/route.ts   # Batch resume evaluation
 ├── chat/route.ts             # AI chat integration
-├── subscription/route.ts     # Polar.sh webhooks (to be removed)
 └── upload-image/route.ts     # File upload handler
 ```
 
@@ -69,10 +74,14 @@ app/api/
 app/
 ├── dashboard/               # Protected dashboard area
 │   ├── _components/        # Dashboard-specific components
-│   ├── chat/              # AI chat interface
+│   ├── resumes/           # Resume management interface
+│   ├── jobs/              # Job description management
+│   ├── evaluations/       # Evaluation results and rankings
 │   ├── upload/            # File upload interface
+│   ├── chat/              # AI chat interface
 │   └── settings/          # User settings
-├── (auth)/                # Authentication pages
+├── sign-in/               # Email/password login
+├── sign-up/               # User registration
 └── api/                   # API routes
 ```
 
@@ -119,51 +128,26 @@ Required environment variables (see `.env.example`):
 ## Current Implementation Status
 
 ### V1 Scope (Email/Password Auth Only)
-- Remove Polar.sh payment integration
-- Focus on core resume evaluation functionality
-- Implement basic file upload and parsing
-- AI-powered job matching and scoring
-- Simple dashboard for viewing results
+- ✅ Database schema implemented for resumes, jobs, evaluations
+- ✅ API route structure created
+- ✅ Basic authentication with Better Auth
+- 🔄 Resume parser implementation (PDF, Word, text)
+- 🔄 AI-powered job matching and scoring engine
+- 🔄 Batch evaluation processing
+- 🔄 Dashboard UI for results visualization
 
-### Core Features to Implement
-1. **Resume Parser**: PDF/Word/text processing
-2. **Job Description Matcher**: AI-powered matching engine
-3. **Scoring System**: Multi-dimensional candidate evaluation
-4. **Batch Processing**: Handle multiple resumes
-5. **Dashboard UI**: Results visualization and ranking
+### Core Features Implementation
+1. **Resume Parser**: File upload with text extraction and AI parsing
+2. **Job Description Matcher**: OpenAI-powered semantic matching
+3. **Scoring System**: Multi-dimensional evaluation (skills, experience, education)
+4. **Batch Processing**: Process multiple resumes against job descriptions
+5. **Dashboard UI**: Results visualization with rankings and detailed analysis
 
-### Database Schema Extensions Needed
-```sql
--- Resume storage and metadata
-CREATE TABLE resumes (
-  id TEXT PRIMARY KEY,
-  filename TEXT NOT NULL,
-  content TEXT NOT NULL,
-  parsed_data JSONB,
-  user_id TEXT REFERENCES user(id),
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Job descriptions
-CREATE TABLE jobs (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL,
-  requirements JSONB,
-  user_id TEXT REFERENCES user(id),
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Evaluation results
-CREATE TABLE evaluations (
-  id TEXT PRIMARY KEY,
-  resume_id TEXT REFERENCES resumes(id),
-  job_id TEXT REFERENCES jobs(id),
-  score DECIMAL NOT NULL,
-  breakdown JSONB,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-```
+### Database Schema (Implemented)
+- **resume** table: File metadata, content, and parsed data
+- **job** table: Job descriptions with requirements and skills
+- **evaluation** table: Detailed scoring with breakdown analysis
+- **user/session** tables: Email/password authentication
 
 ## Testing Strategy
 
@@ -211,7 +195,7 @@ const result = await generateText({
 
 ## File Upload Handling
 
-Current implementation uses Cloudflare R2, but for V1 we'll store files locally or use a simpler solution. The upload interface is already implemented in `app/dashboard/upload/`.
+V1 implementation uses local file processing with in-memory text extraction. Resume files are parsed on upload and stored as text content in the database. The upload interface is implemented in `app/dashboard/upload/`.
 
 ## Deployment Notes
 
